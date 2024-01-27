@@ -85,8 +85,7 @@ def evaluate_strategy(
             print(f'{100*trial_winnings[-1]:.2f}%')
             print('Model test accuracy:')
             print(f'{100*model.accuracy(test):.2f}%')
-
-        print('################################################################################')
+            print('################################################################################')
 
         start_date += date_step
 

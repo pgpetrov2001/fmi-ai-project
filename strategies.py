@@ -15,7 +15,7 @@ def expected_value_cutoff(model, dataset):
     c = coeffs[:, np.arange(games.shape[0]), favorites] # nbookmakers x ngames
     predictions[predictions < 0.5] = 1-predictions[predictions < 0.5]
     expected_values = predictions * c - (1-predictions) # nbookmakers x ngames
-    mask = (predictions != 0.5) * (~np.isnan(expected_values)) * (expected_values > 1.05) # nbookmakers x ngames
+    mask = (predictions != 0.5) * (~np.isnan(expected_values)) * (expected_values > 1.2) # nbookmakers x ngames
     bets = np.zeros(coeffs.shape, dtype=np.float32) # nbookmakers x ngames x 2
 
     if mask.sum() == 0:
@@ -23,4 +23,31 @@ def expected_value_cutoff(model, dataset):
         return bets
 
     bets[mask, favorites[mask.any(axis=0)]] = 1
+    return bets
+
+def every_game_bet_model_favorite(model, dataset):
+    """
+    Just bet 1 dollar on every game based on who the model thinks is the winner
+    """
+    games, coeffs = dataset.get_games_and_coefficients()
+    predictions = model.predict(games) # ngames
+    favorites = (predictions < 0.5).astype(np.int32) # ngames
+    bets = np.zeros(coeffs.shape, dtype=np.float32) # nbookmakers x ngames x 2
+    bets[:, np.arange(games.shape[0]), favorites] = 1
+
+    return bets
+
+def uniform_bet_strategy(model, dataset):
+    _, coeffs = dataset.get_games_and_coefficients()
+    return np.ones_like(coeffs)
+
+def noise_strategy(model, dataset):
+    _, coeffs = dataset.get_games_and_coefficients()
+    return np.random.rand(*coeffs.shape)
+
+def every_game_random_pick_strategy(model, dataset):
+    games, coeffs = dataset.get_games_and_coefficients()
+    picks = (np.random.rand(games.shape[0]) > 0.5) * 1
+    bets = np.zeros_like(coeffs)
+    bets[:, np.arange(games.shape[0]), picks] = 1
     return bets
