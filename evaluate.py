@@ -110,7 +110,7 @@ def evaluate_strategy(
         if verbose:
             print(test_start_date.isoformat(), test_end_date.isoformat())
             print('Final ROI:')
-            print(f'{100*trial_winnings[-1]:.2f}%')
+            print(f'{100*trial_returns[-1]/trial_bets.sum():.2f}%')
             print('Model test accuracy:')
             print(f'{100*model.accuracy(test):.2f}%')
             print('################################################################################')
