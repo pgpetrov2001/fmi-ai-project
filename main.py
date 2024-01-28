@@ -9,7 +9,7 @@ from evaluate import evaluate_strategy
 from strategies import *
 
 if __name__ == '__main__':
-    df = pd.read_csv('atp_data.csv')
+    df = pd.read_csv('data/atp_data.csv')
     dataset = TennisDataset(df)
     winnings = evaluate_strategy(
         dataset,
