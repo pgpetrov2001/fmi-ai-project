@@ -15,7 +15,7 @@ def expected_value_cutoff(model, dataset):
     c = coeffs[:, np.arange(games.shape[0]), favorites] # nbookmakers x ngames
     predictions[predictions < 0.5] = 1-predictions[predictions < 0.5]
     expected_values = predictions * c - (1-predictions) # nbookmakers x ngames
-    mask = (predictions != 0.5) * (~np.isnan(expected_values)) * (expected_values > 1.2) # nbookmakers x ngames
+    mask = (predictions != 0.5) * (~np.isnan(expected_values)) * (expected_values > 1.15) # nbookmakers x ngames
     bets = np.zeros(coeffs.shape, dtype=np.float32) # nbookmakers x ngames x 2
 
     if mask.sum() == 0:

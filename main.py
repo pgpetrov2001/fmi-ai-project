@@ -15,7 +15,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     df = pd.read_csv('data/atp_data.csv')
-    dataset = TennisDataset(df)
+    dataset = TennisDataset(df, bookmakers=['B365'])
     winnings = evaluate_strategy(
         dataset,
         LinearRegressionModel,
@@ -24,6 +24,8 @@ if __name__ == '__main__':
         max_date=date(year=2018, month=3, day=4),
         test_period=timedelta(days=31*4-3),
         plot=True,
+        plot_x='bets_placed',
+        plot_y='roi',
         save_plot=args.save_plot,
         verbose=False,
     )

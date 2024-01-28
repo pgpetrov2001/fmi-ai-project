@@ -3,6 +3,8 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
+from utils import rolling_returns
+
 def evaluate_strategy(
     dataset,
     Model,
@@ -23,8 +25,31 @@ def evaluate_strategy(
     swap_max_dist=10,
     verbose=False,
     plot=True,
+    plot_x='time',
+    plot_y='roi',
     save_plot=None,
 ):
+    valid_plot_x_options = ['games_played', 'bets_placed']
+    if plot_x not in valid_plot_x_options:
+        raise ValueError(f'Invalid value "{plot_x}" for argument plot_x. Valid options are "{valid_plot_x_options}"')
+
+    valid_plot_y_options = ['rolling_roi', 'roi']
+    if plot_y not in valid_plot_y_options:
+        raise ValueError(f'Invalid value "{plot_y}" for argument plot_y. Valid options are "{valid_plot_y_options}"')
+
+    plot_x_option_label = {
+        'games_played': 'Number of games played in period',
+        'bets_placed': 'Number of bets placed'
+    }
+    plot_y_option_label = {
+        'roi': 'ROI(%) - Return Over Investment',
+        'rolling_roi': 'Rolling ROI(%) - Rolling Return Over Investment',
+    }
+    plot_x_option_xlim = {
+        'bets_placed': (0, 150),
+        'games_played': (0, 1200),
+    }
+
     last_start_date = max_date - train_period - test_period - timedelta(days=1)
 
     if random_time_periods:
@@ -32,8 +57,9 @@ def evaluate_strategy(
 
     start_date = min_date
 
+    returns = []
+    bets = []
     date_ranges = []
-    roi_winnings = []
 
     while start_date <= last_start_date:
         train_start_date = start_date
@@ -74,10 +100,11 @@ def evaluate_strategy(
             swap_max_dist=swap_max_dist
         )
 
-        bets = strategy(model, test)
-        trial_winnings = test.winnings(bets, model)
+        trial_bets = strategy(model, test)
+        trial_returns, trial_bets = test.returns(trial_bets, model)
 
-        roi_winnings.append(list(trial_winnings))
+        returns.append(trial_returns)
+        bets.append(trial_bets)
         date_ranges.append([test_start_date, test_end_date])
 
         if verbose:
@@ -91,12 +118,22 @@ def evaluate_strategy(
         start_date += date_step
 
     if plot:
-        print(len(roi_winnings))
-        x = np.concatenate([ np.arange(len(curr_winnings)) for curr_winnings in roi_winnings ])
-        y = [ x*100 for curr_winnings in roi_winnings for x in curr_winnings ]
-        c = [ i for i, curr_winnings in enumerate(roi_winnings) for _ in curr_winnings ]
-        plt.xlabel('Number of games played in period')
+        if plot_y == 'roi':
+            y = [curr_returns.cumsum() / curr_bets.sum() for curr_returns, curr_bets in zip(returns, bets)]
+        elif plot_y == 'rolling_roi':
+            y = [rolling_returns(curr_returns, curr_bets) for curr_returns, curr_bets in zip(returns, bets)]
+
+        if plot_x == 'bets_placed':
+            bet_masks = [ curr_bets != 0 for curr_bets in bets ]
+            bets = [ curr_bets[bet_mask] for curr_bets, bet_mask in zip(bets, bet_masks) ]
+            y = [ curr_y[bet_mask] for curr_y, bet_mask in zip(y, bet_masks) ]
+
+        x = np.concatenate([ np.arange(len(curr_bets)) for curr_bets in bets ])
+        y = [ val*100 for curr_y in y for val in curr_y ]
+        c = [ i for i, curr_bets in enumerate(bets) for _ in curr_bets ]
+        plt.xlabel(plot_x_option_label[plot_x])
         plt.ylabel('ROI (%) - Return Over Investment')
+        plt.xlim(plot_x_option_xlim[plot_x])
         plt.ylim((-100, 200))
         scatter = plt.scatter(x, y, c=c, s=5)
         handles = scatter.legend_elements()[0]
@@ -109,5 +146,3 @@ def evaluate_strategy(
         if save_plot is not None:
             plt.savefig(save_plot)
         plt.show()
-
-    return roi_winnings
