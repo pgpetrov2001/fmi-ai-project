@@ -60,3 +60,7 @@ class LinearRegressionModel(PredictionModel):
         # if we know nothing about one of the players we predict 0.5
         return sigmoid(np.nan_to_num(self.ratings[games[:,0]] - self.ratings[games[:,1]], nan=0))
 
+    @staticmethod
+    def description():
+        return f'Linear Regression Model'
+

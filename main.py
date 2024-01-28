@@ -10,7 +10,11 @@ from evaluate import evaluate_strategy
 from strategies import *
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser("""
+    Evaluate and compare different betting strategies using different prediction models.
+    When using LinearRegressionModel if the error "numpy.linalg.LinAlgError: Singular matrix"
+    occurrs, just rerun the program with the exact same arguments.
+    """)
     parser.add_argument('--save-plot', '-s', type=str, help='Where to save the generated plot. If not specified, will not be saved.')
     args = parser.parse_args()
 
@@ -19,7 +23,7 @@ if __name__ == '__main__':
     winnings = evaluate_strategy(
         dataset,
         LinearRegressionModel,
-        expected_value_cutoff,
+        ExpectedValueCutoff(threshold=0.15),
         min_date=date(year=2005, month=1, day=1),
         max_date=date(year=2018, month=3, day=4),
         test_period=timedelta(days=31*4-3),

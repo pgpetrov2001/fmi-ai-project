@@ -131,6 +131,7 @@ def evaluate_strategy(
         x = np.concatenate([ np.arange(len(curr_bets)) for curr_bets in bets ])
         y = [ val*100 for curr_y in y for val in curr_y ]
         c = [ i for i, curr_bets in enumerate(bets) for _ in curr_bets ]
+        plt.title(f'Model: {Model.description()}. Strategy: {strategy.description()}')
         plt.xlabel(plot_x_option_label[plot_x])
         plt.ylabel(plot_y_option_label[plot_y])
         plt.xlim(plot_x_option_xlim[plot_x])
