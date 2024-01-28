@@ -23,6 +23,7 @@ def evaluate_strategy(
     swap_max_dist=10,
     verbose=False,
     plot=True,
+    save_plot=None,
 ):
     last_start_date = max_date - train_period - test_period - timedelta(days=1)
 
@@ -105,6 +106,8 @@ def evaluate_strategy(
             loc="upper right",
             title="Betting period"
         )
+        if save_plot is not None:
+            plt.savefig(save_plot)
         plt.show()
 
     return roi_winnings

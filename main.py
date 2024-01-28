@@ -1,3 +1,4 @@
+import argparse
 from datetime import date, timedelta
 
 import numpy as np
@@ -9,6 +10,10 @@ from evaluate import evaluate_strategy
 from strategies import *
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--save-plot', '-s', type=str, help='Where to save the generated plot. If not specified, will not be saved.')
+    args = parser.parse_args()
+
     df = pd.read_csv('data/atp_data.csv')
     dataset = TennisDataset(df)
     winnings = evaluate_strategy(
@@ -19,5 +24,6 @@ if __name__ == '__main__':
         max_date=date(year=2018, month=3, day=4),
         test_period=timedelta(days=31*4-3),
         plot=True,
+        save_plot=args.save_plot,
         verbose=False,
     )
