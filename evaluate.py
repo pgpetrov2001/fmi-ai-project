@@ -132,7 +132,7 @@ def evaluate_strategy(
         y = [ val*100 for curr_y in y for val in curr_y ]
         c = [ i for i, curr_bets in enumerate(bets) for _ in curr_bets ]
         plt.xlabel(plot_x_option_label[plot_x])
-        plt.ylabel('ROI (%) - Return Over Investment')
+        plt.ylabel(plot_y_option_label[plot_y])
         plt.xlim(plot_x_option_xlim[plot_x])
         plt.ylim((-100, 200))
         scatter = plt.scatter(x, y, c=c, s=5)
