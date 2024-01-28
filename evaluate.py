@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
-from utils import rolling_returns
+from utils import calculate_returns, rolling_returns
 
 def evaluate_strategy(
     dataset,
@@ -101,7 +101,7 @@ def evaluate_strategy(
         )
 
         trial_bets = strategy(model, test)
-        trial_returns, trial_bets = test.returns(trial_bets, model)
+        trial_returns, trial_bets = calculate_returns(test, trial_bets)
 
         returns.append(trial_returns)
         bets.append(trial_bets)

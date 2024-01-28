@@ -82,14 +82,6 @@ class TennisDataset(Dataset):
     def get_winners(self):
         return self.winners
 
-    def returns(self, bets, model):
-        bets = np.array(bets).reshape(self.games_coefficients.shape)
-        mask = self.games_participants == self.winners[:, np.newaxis]
-        assert (mask.sum(axis=-1) == np.ones(self.games_participants.shape[0])).all() # only 1 wins
-
-        result = (~np.isnan(self.games_coefficients)) * (bets * np.nan_to_num(self.games_coefficients-1) * mask - bets * (~mask))
-        return result.sum(axis=0).sum(axis=-1), bets.sum(axis=0).sum(axis=-1)
-
     def winLoseDataset(self):
         table = np.zeros((len(self.df), len(self.players_index)))
         table[np.arange(table.shape[0]), self.winners] = 1
