@@ -29,7 +29,8 @@ class ExpectedValueCutoff:
             # decided to not make any bets (most likely due to missing data)
             return bets
 
-        bets[mask, favorites[mask.any(axis=0)]] = 1
+        favorites = np.repeat([favorites], coeffs.shape[0], axis=0)
+        bets[mask, favorites[mask]] = 1
         return bets
 
     def description(self):

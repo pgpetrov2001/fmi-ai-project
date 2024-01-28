@@ -19,8 +19,8 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     df = pd.read_csv('data/atp_data.csv')
-    dataset = TennisDataset(df)
-    winnings = evaluate_strategy(
+    dataset = TennisDataset(df, bookmakers=['B365', 'PS'])
+    evaluate_strategy(
         dataset,
         LinearRegressionModel,
         ExpectedValueCutoff(threshold=0.15),
